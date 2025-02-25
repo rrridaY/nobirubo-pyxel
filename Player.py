@@ -9,8 +9,9 @@ class Player(MoveObject):
     """
     プレイヤークラス
     """
-    def __init__(self, _pos:Vector2,_texture:Texture = None):
+    def __init__(self, _pos:Vector2,_texture: Texture = None):
         self.pos = _pos
+        self.texture = _texture
         self.is_crossed = False
         self.color = 7
         self.size = 10
@@ -20,10 +21,10 @@ class Player(MoveObject):
         pass
 
     def draw(self):
-        if Texture != None:
+        if self.texture != None:
             Texture.draw(self.pos.x, self.pos.y)
         else:
-            pyxel.rect(self.pos.x - self.size, self.pos.y - self.size, self.pos.x , self.pos.y, self.color)
+            pyxel.rect(self.pos.x - self.size, self.pos.y - self.size, self.size , self.size, self.color)
     
     
     def move_left(self, speed):

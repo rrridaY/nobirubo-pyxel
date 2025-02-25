@@ -108,4 +108,5 @@ class GameScene(BaseScene):
         self.next_floor.draw()
 
         # プレイヤーを描画
-        pyxel.rect(self.player.pos.x-10, self.player.pos.y-10, 10, 10, 7)
+        # pyxel.rect(self.player.pos.x-10, self.player.pos.y-10, 10, 10, 7)
+        self.player.draw()
