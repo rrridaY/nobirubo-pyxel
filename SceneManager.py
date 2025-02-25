@@ -3,11 +3,12 @@ from Scenes.TitleScene import TitleScene
 
 
 # デバッグ用 #####################
+from constants import *
 from Scenes.GameScene import GameScene
 from Floor import Floor
 from Vector2 import Vector2
-start_floor = Floor(Vector2(50, 90), Vector2(70, 90))
-next_floor = Floor(Vector2(100, 90), Vector2(120, 90))
+start_floor = Floor(Vector2(START_PLAYER_POSX-10, 90+1), Vector2(START_PLAYER_POSX+10, 90+1))
+next_floor = Floor(Vector2(100, 90+1), Vector2(120, 90+1))
 
 #################################
 

@@ -1,3 +1,5 @@
+"""使っていません"""
+
 from Vector2 import Vector2
 import pyxel
 

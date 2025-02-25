@@ -3,6 +3,7 @@ from Vector2 import Vector2
 import pyxel
 
 
+
 class Origin(Vector2):
     """imgsrcの左上の座標"""
     def __init__(self, x, y):
