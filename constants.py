@@ -12,8 +12,12 @@ STICK_DEFAULT_LENGTH = 10    # 棒の初期長さ
 STICK_GROWTH_SPEED = 1       # 棒の伸びる早さ
 STICK_MAX_LENGTH = 90      # 棒の伸び上限
 
+# 定数(床)
+GROUND_OFFSET = 1            # 地面の位置調整
+GROUND_HEIGHT = START_PLAYER_POSY + GROUND_OFFSET
 
 
 # シーン
 TITLE_SCENE = "title"
+
 PLAY_SCENE = "play"
