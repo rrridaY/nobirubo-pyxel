@@ -1,5 +1,7 @@
 from Vector2 import Vector2
 
+import pyxel
+
 
 class Origin(Vector2):
     """imgsrcの左上の座標"""
@@ -13,6 +15,7 @@ class Size(Vector2):
 
 class Texture(Origin, Size):
     """
+    イメージバンク画像を管理できるクラス\n
     Texture(<画像バンク番号>,<画像の左上の座標>,<画像の大きさ>,[colkey])\n
     img: 画像バンクの番号\n
     usage:
@@ -23,3 +26,9 @@ class Texture(Origin, Size):
         self.size = size
         self.imgbnk = img
         self.colkey = colkey
+    
+    def draw(self, x, y):
+        """
+        画像を描画する関数
+        """
+        pyxel.blt(x, y, self.imgbnk, self.origin.x, self.origin.y, self.size.x, self.size.y, self.colkey)
