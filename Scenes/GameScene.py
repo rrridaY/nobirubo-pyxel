@@ -53,7 +53,7 @@ class GameScene(BaseScene):
         
 
         # 左クリックが解除されたら
-        if pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
+        elif pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
             self.is_stick_length_decided = True
             self.stick_end_pos = Vector2(self.player_pos.x + self.stick_length, self.player_pos.y)
 

@@ -7,6 +7,7 @@ from Scenes.GameScene import GameScene
 
 
 class SceneManager:
+    # 最初に実行するシーン
     current_scene = GameScene()
 
     @staticmethod
