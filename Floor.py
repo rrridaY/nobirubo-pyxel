@@ -1,8 +1,10 @@
 from Vector2 import Vector2
+from MoveObject import MoveObject
+
 
 import pyxel
 
-class Floor:
+class Floor(MoveObject):
     """
     床クラス
     usage:
@@ -12,7 +14,7 @@ class Floor:
         self.start_pos = start_pos
         self.end_pos = end_pos
         self.length = self.end_pos.x - self.start_pos.x
-        self.color = 0
+        self.color = 3
 
     def draw(self):
         pyxel.line(self.start_pos.x, self.start_pos.y, self.end_pos.x, self.end_pos.y, self.color)
