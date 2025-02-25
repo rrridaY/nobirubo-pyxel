@@ -13,6 +13,7 @@ from line import line
 from Texture import Texture # イメージバンクの画像情報を保持するクラス
 from Vector2 import Vector2
 from Floor import Floor
+from Stick import Stick
 
 # クラスのインポート(シーン)
 from Scenes.BaseScene import BaseScene
@@ -29,14 +30,12 @@ class GameScene(BaseScene):
         self.player_pos = Vector2(START_PLAYER_POSX, START_PLAYER_POSY)
         
         
-        # 棒の長さ
-        self.stick_length = STICK_DEFAULT_LENGTH
-        # 棒の長さが確定した状態かどうか
-        self.is_stick_length_decided = False
-        # 棒の先端の位置
-        self.stick_end_pos = Vector2(self.player_pos.x, self.player_pos.y - self.stick_length)
         
-        
+        # 棒　after refactoring
+        self.stick = Stick(self.player_pos, STICK_DEFAULT_LENGTH)
+
+
+
         # 現在の床
         self.current_floor = current_floor
         # 次の床    
@@ -49,37 +48,28 @@ class GameScene(BaseScene):
             from SceneManager import SceneManager
             SceneManager.change_scene(GameScene())
 
-        if self.is_stick_length_decided: pass
+        if self.stick.is_length_decided : pass
         
         elif pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) :
             # 棒の長さが最大長さに達していない場合
-            if self.stick_length < STICK_MAX_LENGTH:
-                self.stick_length += STICK_GROWTH_SPEED
-                self.stick_end_pos = Vector2(self.player_pos.x, self.player_pos.y - self.stick_length)
+            if self.stick.length < STICK_MAX_LENGTH:
+                self.stick.grow(STICK_GROWTH_SPEED)
+
             # 棒の長さが最大長さに達した場合
             else:
-                self.is_stick_length_decided = True
-                self.stick_end_pos = Vector2(self.player_pos.x + self.stick_length, self.player_pos.y)
+                self.stick.decide_length()
         
 
         # 左クリックが解除されたら
         elif pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
-            self.is_stick_length_decided = True
-            self.stick_end_pos = Vector2(self.player_pos.x + self.stick_length, self.player_pos.y)
-
+            self.stick.decide_length()
 
 
     def draw(self):
         pyxel.cls(1)
-        # プレイヤー位置から棒を描画
-        if not self.is_stick_length_decided:
-            stick_color = 7
-            pyxel.text(SCREEN_WIDTH -40,SCREEN_HEIGHT // 5, f"{self.stick_length}nobase!", pyxel.COLOR_WHITE)
-        else:
-            stick_color = 8
-            pyxel.text(SCREEN_WIDTH -40,SCREEN_HEIGHT // 5, f"{self.stick_length}decided!", pyxel.COLOR_WHITE)
+        # 棒を描画
+        self.stick.draw()
 
-        line(self.player_pos, self.stick_end_pos, stick_color)
 
         # 床を描画
         self.current_floor.draw()
