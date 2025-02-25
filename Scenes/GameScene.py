@@ -12,6 +12,7 @@ from line import line
 
 from Texture import Texture # イメージバンクの画像情報を保持するクラス
 from Vector2 import Vector2
+from Floor import Floor
 
 # クラスのインポート(シーン)
 from Scenes.BaseScene import BaseScene
@@ -23,15 +24,24 @@ from constants import *
 
 
 class GameScene(BaseScene):
-    def __init__(self):
+    def __init__(self,current_floor : Floor,next_floor : Floor):
         # プレイヤーの初期位置
         self.player_pos = Vector2(START_PLAYER_POSX, START_PLAYER_POSY)
+        
+        
         # 棒の長さ
         self.stick_length = STICK_DEFAULT_LENGTH
         # 棒の長さが確定した状態かどうか
         self.is_stick_length_decided = False
         # 棒の先端の位置
         self.stick_end_pos = Vector2(self.player_pos.x, self.player_pos.y - self.stick_length)
+        
+        
+        # 現在の床
+        self.current_floor = current_floor
+        # 次の床    
+        self.next_floor = next_floor
+
 
 
     def update(self):
@@ -70,3 +80,7 @@ class GameScene(BaseScene):
             pyxel.text(SCREEN_WIDTH -40,SCREEN_HEIGHT // 5, f"{self.stick_length}decided!", pyxel.COLOR_WHITE)
 
         line(self.player_pos, self.stick_end_pos, stick_color)
+
+        # 床を描画
+        self.current_floor.draw()
+        self.next_floor.draw()
