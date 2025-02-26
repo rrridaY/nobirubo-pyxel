@@ -1,6 +1,7 @@
 from Vector2 import Vector2
 from MoveObject import MoveObject
 from Texture import Texture
+from Floor import Floor
 
 
 import pyxel
@@ -14,7 +15,10 @@ class Player(MoveObject):
         self.texture = _texture
         self.is_crossed = False
         self.color = 7
-        self.size = 10
+        if self.texture != None:
+            self.size = Vector2(self.texture.size.x, self.texture.size.y)
+        else:
+            self.size = Vector2(5, 10)
 
 
     def update(self):
@@ -24,7 +28,19 @@ class Player(MoveObject):
         if self.texture != None:
             Texture.draw(self.pos.x, self.pos.y)
         else:
-            pyxel.rect(self.pos.x - self.size, self.pos.y - self.size, self.size , self.size, self.color)
+            pyxel.rect(self.pos.x - self.size.x, self.pos.y - self.size.y, self.size.x , self.size.y, self.color)
+    
+
+    def is_x_reached(self, x):
+        return self.pos.x > x
+    
+    
+    
+    def is_x_in_range(self, start, end):
+        return start <= self.pos.x <= end
+    
+    def is_on_floor(self, floor : Floor):
+        return floor.start_pos.x <= self.pos.x <= floor.end_pos.x + self.size.x
     
     
     def move_left(self, speed):
