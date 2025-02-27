@@ -6,6 +6,8 @@ from Floor import Floor
 
 import pyxel
 
+from constants import PLAYER_MOVE_SPEED
+
 class Player(MoveObject):
     """
     プレイヤークラス
@@ -21,15 +23,19 @@ class Player(MoveObject):
             self.size = Vector2(5, 10)
 
 
-    def update(self):
-        pass
+    def update(self,stick_end_pos:Vector2):
+        # プレイヤーが移動中
+        self.move_right(PLAYER_MOVE_SPEED)
+        if self.is_x_reached(stick_end_pos.x + self.size.x):
+            from Scenes.GameScene import GameStatusManager, GameStatus
+            GameStatusManager.change_status(GameStatus.PLAYER_REACHED_STICK_END)
+        
 
     def draw(self):
-        if self.texture != None:
-            Texture.draw(self.pos.x, self.pos.y)
-        else:
+        if self.texture == None:
             pyxel.rect(self.pos.x - self.size.x, self.pos.y - self.size.y, self.size.x , self.size.y, self.color)
-    
+        elif self.texture != None:
+            Texture.draw(self.pos.x, self.pos.y)
 
     def is_x_reached(self, x):
         return self.pos.x > x

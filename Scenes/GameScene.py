@@ -2,6 +2,9 @@
 # ライブラリのインポート
 
 import pyxel
+import webbrowser # web　SNSシェア用
+import random
+import enum
 
 # 関数のインポート
 
@@ -9,7 +12,7 @@ from plotTex import plotTexture
 from line import line
 
 # クラスのインポート(データ処理)
-import random
+
 from Texture import Texture # イメージバンクの画像情報を保持するクラス
 from Vector2 import Vector2
 from Player import Player
@@ -23,6 +26,34 @@ from Scenes.BaseScene import BaseScene
 from constants import *
 
 
+# GameScene状態管理用クラス
+class GameStatus(enum.Enum):
+    
+    INPUT_STICK_LENGTH = enum.auto()
+    """棒の長さを受け付け中"""
+
+    PLAYER_MOVING = enum.auto()
+    """棒の長さを決定後、プレイヤーが移動中"""
+
+    PLAYER_REACHED_STICK_END = enum.auto()
+    """プレイヤーが棒に到達したとき"""
+
+    PLAYER_ON_NEXT_FLOOR = enum.auto()
+    """プレイヤーが床に乗ったとき"""
+
+    PLAYER_NOT_ON_NEXT_FLOOR = enum.auto()
+    """プレイヤーが床に乗らなかったとき"""
+
+    GAMEOVER = enum.auto()
+    """ゲームオーバー"""
+
+# GameScene状態管理用クラス
+class GameStatusManager:
+    current_status = GameStatus.INPUT_STICK_LENGTH
+
+    @staticmethod
+    def change_status(status):
+        GameStatusManager.current_status = status
 
 
 class GameScene(BaseScene):
@@ -31,6 +62,7 @@ class GameScene(BaseScene):
             current_floor : Floor,
             next_floor : Floor,
             prev_stick : Stick = Stick(Vector2(0, 90), 0),
+            game_status : GameStatus = GameStatus.INPUT_STICK_LENGTH,
             score: int = 0
             ):
         # プレイヤーの初期位置
@@ -45,6 +77,9 @@ class GameScene(BaseScene):
         # ひとつ前の棒
         self.prev_stick = prev_stick
 
+        # 現在のゲーム状態
+        # self.game_status = game_status
+
 
 
         # 現在の床
@@ -58,12 +93,20 @@ class GameScene(BaseScene):
         # GAME OVER描画用
         self.game_over_flame = 0
 
+        # シーンの状態を初期化
+        game_status = GameStatus.INPUT_STICK_LENGTH
+        GameStatusManager.change_status(game_status)
+
 
 
     def update(self):
+        # デバッグ用 シーンリセット #############
         if pyxel.btnp(pyxel.KEY_R):
             from SceneManager import SceneManager
             SceneManager.change_scene(GameScene())
+
+        #######################################
+
 
         # デバッグ用 30フレームごとにプリント ####
         if pyxel.frame_count % 30 == 0:
@@ -72,52 +115,39 @@ class GameScene(BaseScene):
         #######################################
 
         # 棒が伸びる前の処理
-        if not self.stick.is_length_decided : 
-        
-            if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) :
-                # 棒の長さが最大長さに達していない場合
-                if self.stick.length < STICK_MAX_LENGTH:
-                    self.stick.grow(STICK_GROWTH_SPEED)
+        if GameStatusManager.current_status == GameStatus.INPUT_STICK_LENGTH :
+            self.stick.update()
 
-                # 棒の長さが最大長さに達した場合
-                else:
-                    self.stick.decide_length()
-            
-
-            # 左クリックが解除されたら
-            elif pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
-                self.stick.decide_length()
-        
         # 棒が伸びた後の処理
-        elif self.stick.is_length_decided :
-            # プレイヤーが移動中
-            if not self.player.is_crossed:
-                self.player.move_right(PLAYER_MOVE_SPEED)
-                if self.player.is_x_reached(self.stick.end_pos.x+self.player.size.x):
-                    self.player.is_crossed = True
+        elif GameStatusManager.current_status == GameStatus.PLAYER_MOVING:
+            self.player.update(self.stick.end_pos)
 
-            
-            # プレイヤーが移動完了後
-            elif self.player.is_crossed:
-                if self.player.is_on_floor(self.next_floor):
+        elif GameStatusManager.current_status == GameStatus.PLAYER_REACHED_STICK_END:
+            # プレイヤーが棒に到達した後
+            if self.player.is_on_floor(self.next_floor):
+                GameStatusManager.change_status(GameStatus.PLAYER_ON_NEXT_FLOOR)
+            else:
+                GameStatusManager.change_status(GameStatus.PLAYER_NOT_ON_NEXT_FLOOR)
 
-                    # プレイヤーが床に乗る
-                    start_floor = Floor(Vector2(START_PLAYER_POSX-10, 90+1), Vector2(START_PLAYER_POSX+10, 90+1))
-                    a = random.randint(start_floor.end_pos.x + 10, 139)
-                    b = random.randint(a, 140)
-                    next_floor = Floor(Vector2(a, 90+1), Vector2(b, 90+1))
-                    from SceneManager import SceneManager
-                    SceneManager.change_scene(GameScene(start_floor, next_floor, score=self.score+1))
+                
+        elif GameStatusManager.current_status == GameStatus.PLAYER_ON_NEXT_FLOOR:
+            # プレイヤーが床に乗る
+            start_floor = Floor(Vector2(START_PLAYER_POSX-10, 90+1), Vector2(START_PLAYER_POSX+10, 90+1))
+            a = random.randint(start_floor.end_pos.x + 10, 139)
+            b = random.randint(a, 140)
+            next_floor = Floor(Vector2(a, 90+1), Vector2(b, 90+1))
+            from SceneManager import SceneManager
+            SceneManager.change_scene(GameScene(start_floor, next_floor, score=self.score+1))
 
 
-                else:
-                    # プレイヤーが床から落ちる
-                    self.player.fall(PLAYER_FALL_SPEED)
-                    if self.player.pos.y > SCREEN_HEIGHT:
-                        self.game_over_flame += 1
-                        if self.game_over_flame > 30 * 3:
-                            # ゲーム終了
-                            pyxel.quit()
+        elif GameStatusManager.current_status == GameStatus.PLAYER_NOT_ON_NEXT_FLOOR:
+            # プレイヤーが床から落ちる
+            self.player.fall(PLAYER_FALL_SPEED)
+            if self.player.pos.y > SCREEN_HEIGHT:
+                self.game_over_flame += 1
+                if self.game_over_flame > 30 * 3:
+                    # ゲーム終了
+                    pyxel.quit()
 
 
         # デバッグ　左に動かす #################
@@ -153,8 +183,8 @@ class GameScene(BaseScene):
         # スコアを描画
         pyxel.text(80, 20, "SCORE: " + str(self.score), 7)
 
-        # playerの座標を描画（点）
-        pyxel.pset(self.player.pos.x, self.player.pos.y, 6)
+        # デバッグ用 playerの座標を描画（点）
+        # pyxel.pset(self.player.pos.x, self.player.pos.y, 6)
 
         # GAME OVERを描画
         if self.game_over_flame > 0:

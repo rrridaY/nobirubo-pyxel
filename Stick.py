@@ -3,6 +3,8 @@ from MoveObject import MoveObject
 
 import pyxel
 
+from constants import STICK_MAX_LENGTH, STICK_GROWTH_SPEED
+
 class Stick(MoveObject):
     """棒クラス"""
 
@@ -16,6 +18,26 @@ class Stick(MoveObject):
 
         # 赤
         self.color = 4
+
+    def update(self):
+        if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) :
+            # 棒の長さが最大長さに達していない場合
+            if self.length < STICK_MAX_LENGTH:
+                self.grow(STICK_GROWTH_SPEED)
+
+            # 棒の長さが最大長さに達した場合
+            else:
+                self.decide_length()
+                from Scenes.GameScene import GameStatusManager, GameStatus
+                GameStatusManager.change_status(GameStatus.PLAYER_MOVING)
+                
+        
+
+            # 左クリックが解除されたら
+        elif pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
+            self.decide_length()
+            from Scenes.GameScene import GameStatusManager, GameStatus
+            GameStatusManager.change_status(GameStatus.PLAYER_MOVING)
 
     
     def draw(self):
