@@ -17,6 +17,10 @@ STICK_MAX_LENGTH = 90      # 棒の伸び上限
 # 定数(床)
 GROUND_OFFSET = 1            # 地面の位置調整
 GROUND_HEIGHT = START_PLAYER_POSY + GROUND_OFFSET
+FLOOR_X_MAX = SCREEN_WIDTH - START_PLAYER_POSX
+
+# 定数(全オブジェクト移動用)
+ALL_OBJECTS_MOVE_SPEED = 1
 
 
 # シーン

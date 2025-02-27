@@ -6,13 +6,10 @@ from Scenes.TitleScene import TitleScene
 from constants import *
 from Scenes.GameScene import GameScene
 from Floor import Floor
-from Vector2 import Vector2
-import random
-start_floor = Floor(Vector2(START_PLAYER_POSX-10, 90+1), Vector2(START_PLAYER_POSX+10, 90+1))
-a = random.randint(start_floor.end_pos.x + 10, 139)
-b = random.randint(a, 140)
-next_floor = Floor(Vector2(a, 90+1), Vector2(b, 90+1))
-
+from Floor import create_start_floor
+start_floor:Floor = create_start_floor()
+print(f"start_floor_start_pos_x:{start_floor.start_pos.x}, start_floor_end_pos_x:{start_floor.end_pos.x}")
+next_floor = start_floor.create_next_floor()
 #################################
 
 
