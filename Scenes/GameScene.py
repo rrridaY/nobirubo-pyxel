@@ -44,6 +44,9 @@ class GameStatus(enum.Enum):
     PLAYER_NOT_ON_NEXT_FLOOR = enum.auto()
     """プレイヤーが床に乗らなかったとき"""
 
+    PLAYER_RETURNED_TO_START_POS = enum.auto()
+    """プレイヤーが戻ったとき"""
+
     GAMEOVER = enum.auto()
     """ゲームオーバー"""
 
@@ -54,6 +57,12 @@ class GameStatusManager:
     @staticmethod
     def change_status(status):
         GameStatusManager.current_status = status
+
+
+# GameSceneで全オブジェクトを左に移動
+def move_all_left(objs, speed):
+    for obj in objs:
+        obj.move_left(speed)
 
 
 class GameScene(BaseScene):
@@ -76,10 +85,6 @@ class GameScene(BaseScene):
 
         # ひとつ前の棒
         self.prev_stick = prev_stick
-
-        # 現在のゲーム状態
-        # self.game_status = game_status
-
 
 
         # 現在の床
@@ -109,8 +114,8 @@ class GameScene(BaseScene):
 
 
         # デバッグ用 30フレームごとにプリント ####
-        if pyxel.frame_count % 30 == 0:
-            print("player: ", self.player.pos.x,"next_floor_start: ", self.next_floor.start_pos.x, "next_floor_end: ", self.next_floor.end_pos.x)
+        # if pyxel.frame_count % 30 == 0:
+        #     print("player: ", self.player.pos.x,"next_floor_start: ", self.next_floor.start_pos.x, "next_floor_end: ", self.next_floor.end_pos.x)
 
         #######################################
 
@@ -122,22 +127,25 @@ class GameScene(BaseScene):
         elif GameStatusManager.current_status == GameStatus.PLAYER_MOVING:
             self.player.update(self.stick.end_pos)
 
+        # プレイヤーが棒に到達した後の処理
         elif GameStatusManager.current_status == GameStatus.PLAYER_REACHED_STICK_END:
-            # プレイヤーが棒に到達した後
             if self.player.is_on_floor(self.next_floor):
                 GameStatusManager.change_status(GameStatus.PLAYER_ON_NEXT_FLOOR)
+            elif self.player.is_on_floor(self.current_floor):
+                self.stick = Stick(Vector2(self.player.pos.x + 1, self.player.pos.y), STICK_DEFAULT_LENGTH)
+                GameStatusManager.change_status(GameStatus.INPUT_STICK_LENGTH)
             else:
                 GameStatusManager.change_status(GameStatus.PLAYER_NOT_ON_NEXT_FLOOR)
 
-                
+        # プレイヤーが床に乗った後の処理
         elif GameStatusManager.current_status == GameStatus.PLAYER_ON_NEXT_FLOOR:
-            # プレイヤーが床に乗る
-            start_floor = Floor(Vector2(START_PLAYER_POSX-10, 90+1), Vector2(START_PLAYER_POSX+10, 90+1))
-            a = random.randint(start_floor.end_pos.x + 10, 139)
-            b = random.randint(a, 140)
-            next_floor = Floor(Vector2(a, 90+1), Vector2(b, 90+1))
-            from SceneManager import SceneManager
-            SceneManager.change_scene(GameScene(start_floor, next_floor, score=self.score+1))
+            # start_floor = self.current_floor
+            # next_floor = start_floor.create_next_floor()
+            move_all_left([self.stick, self.current_floor, self.next_floor, self.prev_stick,self.player], ALL_OBJECTS_MOVE_SPEED)
+            if self.player.pos.x == START_PLAYER_POSX:
+                GameStatusManager.change_status(GameStatus.PLAYER_RETURNED_TO_START_POS)
+            # from SceneManager import SceneManager
+            # SceneManager.change_scene(GameScene(start_floor, next_floor, score=self.score+1))
 
 
         elif GameStatusManager.current_status == GameStatus.PLAYER_NOT_ON_NEXT_FLOOR:
@@ -145,10 +153,16 @@ class GameScene(BaseScene):
             self.player.fall(PLAYER_FALL_SPEED)
             if self.player.pos.y > SCREEN_HEIGHT:
                 self.game_over_flame += 1
-                if self.game_over_flame > 30 * 3:
+                if self.game_over_flame > 30 * 2:
                     # ゲーム終了
                     pyxel.quit()
 
+        # プレイヤーがスタート地点に戻った後の処理
+        elif GameStatusManager.current_status == GameStatus.PLAYER_RETURNED_TO_START_POS:
+            start_floor = self.next_floor
+            next_floor = start_floor.create_next_floor()
+            from SceneManager import SceneManager
+            SceneManager.change_scene(GameScene(start_floor, next_floor, score=self.score+1))
 
         # デバッグ　左に動かす #################
         if pyxel.btn(pyxel.KEY_LEFT):
@@ -165,7 +179,11 @@ class GameScene(BaseScene):
         #######################################
 
     def draw(self):
+        # 背景を描画
         pyxel.cls(1)
+        # マウスを描画
+        pyxel.mouse(True)
+
         # 棒を描画
         self.stick.draw()
         self.prev_stick.draw()
