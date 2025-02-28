@@ -10,6 +10,7 @@ import enum
 
 from plotTex import plotTexture
 from line import line
+from Stick import create_start_stick
 
 # クラスのインポート(データ処理)
 
@@ -78,10 +79,10 @@ class GameScene(BaseScene):
             score: int = 0
             ):
         # プレイヤーの初期位置
-        self.player = Player(Vector2(START_PLAYER_POSX, START_PLAYER_POSY))
+        self.player = Player(Vector2(START_PLAYER_POSX, current_floor.start_pos.y))
         
         # 棒
-        self.stick = Stick(Vector2(START_PLAYER_POSX, START_PLAYER_POSY), STICK_DEFAULT_LENGTH)
+        self.stick = create_start_stick(self.player.pos)
 
         # ひとつ前の棒
         self.prev_stick = prev_stick
@@ -107,8 +108,11 @@ class GameScene(BaseScene):
     def update(self):
         # デバッグ用 シーンリセット #############
         if pyxel.btnp(pyxel.KEY_R):
+            start_floor = self.current_floor
+            next_floor = start_floor.create_next_floor()
             from SceneManager import SceneManager
-            SceneManager.change_scene(GameScene())
+            SceneManager.change_scene(GameScene(start_floor, next_floor))
+
 
         #######################################
 
@@ -127,14 +131,14 @@ class GameScene(BaseScene):
         # 棒が伸びた後の処理
         elif GameStatusManager.is_status(GameStatus.PLAYER_MOVING):
         # elif GameStatusManager.current_status == GameStatus.PLAYER_MOVING:
-            self.player.update(self.stick.end_pos)
+            self.player.update(self.stick)
 
         # プレイヤーが棒に到達した後の処理
         elif GameStatusManager.is_status(GameStatus.PLAYER_REACHED_STICK_END):
             if self.player.is_on_floor(self.next_floor):
                 GameStatusManager.change_status(GameStatus.PLAYER_ON_NEXT_FLOOR)
             elif self.player.is_on_floor(self.current_floor):
-                self.stick = Stick(Vector2(self.player.pos.x + 1, self.player.pos.y), STICK_DEFAULT_LENGTH)
+                self.stick = create_start_stick(self.player.pos)
                 GameStatusManager.change_status(GameStatus.INPUT_STICK_LENGTH)
             else:
                 GameStatusManager.change_status(GameStatus.PLAYER_NOT_ON_NEXT_FLOOR)
@@ -160,7 +164,7 @@ class GameScene(BaseScene):
             start_floor = self.next_floor
             next_floor = start_floor.create_next_floor()
             from SceneManager import SceneManager
-            SceneManager.change_scene(GameScene(start_floor, next_floor, score=self.score+1))
+            SceneManager.change_scene(GameScene(start_floor, next_floor, prev_stick=self.stick, score=self.score+1))
 
         # デバッグ　左に動かす #################
         if pyxel.btn(pyxel.KEY_LEFT):
