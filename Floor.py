@@ -5,7 +5,7 @@ from MoveObject import MoveObject
 import pyxel
 import random
 
-from constants import  GROUND_HEIGHT, FLOOR_X_MAX, START_PLAYER_POSX
+from constants import  GROUND_HEIGHT, FLOOR_X_MAX, START_PLAYER_POSX , NEXT_FLOOR_MIN_DISTANCE
 
 class Floor(MoveObject):
     """
@@ -29,11 +29,17 @@ class Floor(MoveObject):
             floor_length (int, optional): 床の長さ上限を指定できる 
             
         """
-        next_floor_start_x = random.randint(self.end_pos.x + 10, FLOOR_X_MAX)
+        # 床の始点X座標
+        next_floor_start_x = random.randint(self.end_pos.x + NEXT_FLOOR_MIN_DISTANCE, FLOOR_X_MAX)
+        
+        # 床の終点X座標
         if floor_length: # 床の長さ上限を設定する場合
             next_floor_end_x = random.randint(next_floor_start_x, next_floor_start_x + floor_length)
-        else:
+        
+        else:            # 床の長さ上限を設定しない場合
             next_floor_end_x = random.randint(next_floor_start_x, FLOOR_X_MAX)
+        
+        print(f"next_floor_start_x:{next_floor_start_x}, next_floor_end_x:{next_floor_end_x}")
         return Floor(Vector2(next_floor_start_x, GROUND_HEIGHT), Vector2(next_floor_end_x, GROUND_HEIGHT))
         
     
