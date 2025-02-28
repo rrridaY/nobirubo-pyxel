@@ -127,6 +127,7 @@ class GameScene(BaseScene):
         if GameStatusManager.is_status(GameStatus.INPUT_STICK_LENGTH):
         # if GameStatusManager.current_status == GameStatus.INPUT_STICK_LENGTH :
             self.stick.update()
+            self.player.pos.y = self.current_floor.start_pos.y
 
         # 棒が伸びた後の処理
         elif GameStatusManager.is_status(GameStatus.PLAYER_MOVING):
@@ -136,8 +137,10 @@ class GameScene(BaseScene):
         # プレイヤーが棒に到達した後の処理
         elif GameStatusManager.is_status(GameStatus.PLAYER_REACHED_STICK_END):
             if self.player.is_on_floor(self.next_floor):
+                self.player.pos.y = self.next_floor.start_pos.y
                 GameStatusManager.change_status(GameStatus.PLAYER_ON_NEXT_FLOOR)
             elif self.player.is_on_floor(self.current_floor):
+                self.player.pos.y = self.current_floor.start_pos.y
                 self.stick = create_start_stick(self.player.pos)
                 GameStatusManager.change_status(GameStatus.INPUT_STICK_LENGTH)
             else:
