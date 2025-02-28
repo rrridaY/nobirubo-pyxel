@@ -75,7 +75,6 @@ class GameScene(BaseScene):
             score: int = 0
             ):
         # プレイヤーの初期位置
-        # self.player_pos = Vector2(START_PLAYER_POSX, START_PLAYER_POSY)
         self.player = Player(Vector2(START_PLAYER_POSX, START_PLAYER_POSY))
         
         
