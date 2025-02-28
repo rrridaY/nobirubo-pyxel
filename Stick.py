@@ -51,6 +51,9 @@ class Stick(MoveObject):
     def decide_length(self):
         self.is_length_decided = True
         self.end_pos = Vector2(self.start_pos.x + self.length, self.start_pos.y)
+
+    def change_color(self, color):
+        self.color = color
     
     # def move_left(self, speed):
     #     self.start_pos.x -= speed
