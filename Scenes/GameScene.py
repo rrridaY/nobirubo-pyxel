@@ -139,13 +139,9 @@ class GameScene(BaseScene):
 
         # プレイヤーが床に乗った後の処理
         elif GameStatusManager.current_status == GameStatus.PLAYER_ON_NEXT_FLOOR:
-            # start_floor = self.current_floor
-            # next_floor = start_floor.create_next_floor()
             move_all_left([self.stick, self.current_floor, self.next_floor, self.prev_stick,self.player], ALL_OBJECTS_MOVE_SPEED)
-            if self.player.pos.x == START_PLAYER_POSX:
+            if self.player.pos.x < START_PLAYER_POSX:
                 GameStatusManager.change_status(GameStatus.PLAYER_RETURNED_TO_START_POS)
-            # from SceneManager import SceneManager
-            # SceneManager.change_scene(GameScene(start_floor, next_floor, score=self.score+1))
 
 
         elif GameStatusManager.current_status == GameStatus.PLAYER_NOT_ON_NEXT_FLOOR:

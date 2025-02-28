@@ -8,7 +8,6 @@ from Scenes.GameScene import GameScene
 from Floor import Floor
 from Floor import create_start_floor
 start_floor:Floor = create_start_floor()
-print(f"start_floor_start_pos_x:{start_floor.start_pos.x}, start_floor_end_pos_x:{start_floor.end_pos.x}")
 next_floor = start_floor.create_next_floor()
 #################################
 
