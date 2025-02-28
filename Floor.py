@@ -49,6 +49,6 @@ def create_start_floor(
         start_pos : Vector2 = Vector2(START_PLAYER_POSX - 10, GROUND_HEIGHT),
         end_pos : Vector2 = Vector2(START_PLAYER_POSX + 10, GROUND_HEIGHT)
         ):
-    if not isinstance(start_pos, Vector2) and isinstance(end_pos, Vector2):
+    if not isinstance(start_pos, Vector2) or not isinstance(end_pos, Vector2):
         raise TypeError("start_pos and end_pos must be Vector2")
     return Floor(start_pos, end_pos)
