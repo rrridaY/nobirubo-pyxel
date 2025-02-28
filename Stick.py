@@ -3,7 +3,7 @@ from MoveObject import MoveObject
 
 import pyxel
 
-from constants import STICK_MAX_LENGTH, STICK_GROWTH_SPEED
+from constants import STICK_MAX_LENGTH, STICK_GROWTH_SPEED,STICK_DEFAULT_LENGTH
 
 class Stick(MoveObject):
     """棒クラス"""
@@ -58,3 +58,6 @@ class Stick(MoveObject):
     # def move_left(self, speed):
     #     self.start_pos.x -= speed
     #     self.end_pos.x -= speed 
+
+def create_start_stick(player_pos:Vector2):
+    return Stick(Vector2(player_pos.x,player_pos.y - 1), STICK_DEFAULT_LENGTH)
