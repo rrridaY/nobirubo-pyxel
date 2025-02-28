@@ -57,6 +57,9 @@ class GameStatusManager:
     @staticmethod
     def change_status(status):
         GameStatusManager.current_status = status
+    
+    def is_status(status):
+        return GameStatusManager.current_status == status
 
 
 # GameSceneで全オブジェクトを左に移動
@@ -77,8 +80,6 @@ class GameScene(BaseScene):
         # プレイヤーの初期位置
         self.player = Player(Vector2(START_PLAYER_POSX, START_PLAYER_POSY))
         
-        
-        
         # 棒
         self.stick = Stick(Vector2(START_PLAYER_POSX, START_PLAYER_POSY), STICK_DEFAULT_LENGTH)
 
@@ -98,7 +99,7 @@ class GameScene(BaseScene):
         self.game_over_flame = 0
 
         # シーンの状態を初期化
-        game_status = GameStatus.INPUT_STICK_LENGTH
+        # game_status = GameStatus.INPUT_STICK_LENGTH
         GameStatusManager.change_status(game_status)
 
 
@@ -119,15 +120,17 @@ class GameScene(BaseScene):
         #######################################
 
         # 棒が伸びる前の処理
-        if GameStatusManager.current_status == GameStatus.INPUT_STICK_LENGTH :
+        if GameStatusManager.is_status(GameStatus.INPUT_STICK_LENGTH):
+        # if GameStatusManager.current_status == GameStatus.INPUT_STICK_LENGTH :
             self.stick.update()
 
         # 棒が伸びた後の処理
-        elif GameStatusManager.current_status == GameStatus.PLAYER_MOVING:
+        elif GameStatusManager.is_status(GameStatus.PLAYER_MOVING):
+        # elif GameStatusManager.current_status == GameStatus.PLAYER_MOVING:
             self.player.update(self.stick.end_pos)
 
         # プレイヤーが棒に到達した後の処理
-        elif GameStatusManager.current_status == GameStatus.PLAYER_REACHED_STICK_END:
+        elif GameStatusManager.is_status(GameStatus.PLAYER_REACHED_STICK_END):
             if self.player.is_on_floor(self.next_floor):
                 GameStatusManager.change_status(GameStatus.PLAYER_ON_NEXT_FLOOR)
             elif self.player.is_on_floor(self.current_floor):
@@ -137,13 +140,13 @@ class GameScene(BaseScene):
                 GameStatusManager.change_status(GameStatus.PLAYER_NOT_ON_NEXT_FLOOR)
 
         # プレイヤーが床に乗った後の処理
-        elif GameStatusManager.current_status == GameStatus.PLAYER_ON_NEXT_FLOOR:
+        elif GameStatusManager.is_status(GameStatus.PLAYER_ON_NEXT_FLOOR):
             move_all_left([self.stick, self.current_floor, self.next_floor, self.prev_stick,self.player], ALL_OBJECTS_MOVE_SPEED)
             if self.player.pos.x < START_PLAYER_POSX:
                 GameStatusManager.change_status(GameStatus.PLAYER_RETURNED_TO_START_POS)
 
 
-        elif GameStatusManager.current_status == GameStatus.PLAYER_NOT_ON_NEXT_FLOOR:
+        elif GameStatusManager.is_status(GameStatus.PLAYER_NOT_ON_NEXT_FLOOR):
             # プレイヤーが床から落ちる
             self.player.fall(PLAYER_FALL_SPEED)
             if self.player.pos.y > SCREEN_HEIGHT:
@@ -153,7 +156,7 @@ class GameScene(BaseScene):
                     pyxel.quit()
 
         # プレイヤーがスタート地点に戻った後の処理
-        elif GameStatusManager.current_status == GameStatus.PLAYER_RETURNED_TO_START_POS:
+        elif GameStatusManager.is_status(GameStatus.PLAYER_RETURNED_TO_START_POS):
             start_floor = self.next_floor
             next_floor = start_floor.create_next_floor()
             from SceneManager import SceneManager
