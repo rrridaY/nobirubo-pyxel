@@ -2,6 +2,7 @@ from Vector2 import Vector2
 from MoveObject import MoveObject
 from Texture import Texture
 from Floor import Floor
+from Stick import Stick
 
 
 import pyxel
@@ -23,10 +24,16 @@ class Player(MoveObject):
             self.size = Vector2(5, 10)
 
 
-    def update(self,stick_end_pos:Vector2):
+    def update(self,stick: Stick):
         # プレイヤーが移動中
         self.move_right(PLAYER_MOVE_SPEED)
-        if self.is_x_reached(stick_end_pos.x + self.size.x):
+
+        # 棒の高さに応じてy座標を変更
+        self.pos.y = (stick.start_pos.y + stick.end_pos.y) // 2
+
+
+        if self.is_x_reached(stick.end_pos.x + self.size.x):
+            self.pos.y = stick.end_pos.y + 1
             from Scenes.GameScene import GameStatusManager, GameStatus
             GameStatusManager.change_status(GameStatus.PLAYER_REACHED_STICK_END)
         
