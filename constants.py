@@ -13,6 +13,8 @@ STICK_WIDTH = 2
 STICK_DEFAULT_LENGTH = 10    # 棒の初期長さ
 STICK_GROWTH_SPEED = 1       # 棒の伸びる早さ
 STICK_MAX_LENGTH = 90      # 棒の伸び上限
+STICK_SPIN_DEGREE = 90       # 棒の回転角度
+STICK_SPIN_TOTAL_FRAME = 10  # 棒の回転にかかるフレーム数
 
 # 定数(床)
 GROUND_OFFSET = 1            # 地面の位置調整
