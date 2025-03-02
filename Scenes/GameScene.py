@@ -33,6 +33,12 @@ class GameStatus(enum.Enum):
     INPUT_STICK_LENGTH = enum.auto()
     """棒の長さを受け付け中"""
 
+    CALC_STICK_SPIN_AMIM = enum.auto()
+    """棒の回転アニメーションを計算中"""
+
+    STICK_SPINNING = enum.auto()
+    """棒が回転中"""
+
     PLAYER_MOVING = enum.auto()
     """棒の長さを決定後、プレイヤーが移動中"""
 
@@ -129,9 +135,28 @@ class GameScene(BaseScene):
             self.stick.update()
             self.player.pos.y = self.current_floor.start_pos.y
 
+        # 棒が回転アニメーションを計算中の処理 
+        elif GameStatusManager.is_status(GameStatus.CALC_STICK_SPIN_AMIM):
+            self.stick.fall_pos = self.stick.create_spin_pos_with_digree(STICK_SPIN_DEGREE,STICK_SPIN_TOTAL_FRAME)
+            print(f"start_pos: x: {self.stick.start_pos.x}, y: {self.stick.start_pos.y}")
+            print(f"end_pos: x: {self.stick.end_pos.x}, y: {self.stick.end_pos.y}")
+            for pos in self.stick.fall_pos:
+                print(f"x: {pos.x}, y: {pos.y}")
+            GameStatusManager.change_status(GameStatus.STICK_SPINNING)
+
+        # 棒が回転中の処理
+        elif GameStatusManager.is_status(GameStatus.STICK_SPINNING):
+            pos = self.stick.fall_pos.pop(0)
+            self.stick.end_pos.x = pos.x
+            self.stick.end_pos.y = pos.y
+            if len(self.stick.fall_pos) == 0:
+                # 移動座標リストが空になったら
+                GameStatusManager.change_status(GameStatus.PLAYER_MOVING)
+            
+
+
         # 棒が伸びた後の処理
         elif GameStatusManager.is_status(GameStatus.PLAYER_MOVING):
-        # elif GameStatusManager.current_status == GameStatus.PLAYER_MOVING:
             self.player.update(self.stick)
 
         # プレイヤーが棒に到達した後の処理
