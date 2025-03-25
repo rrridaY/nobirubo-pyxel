@@ -51,4 +51,4 @@ def create_start_floor(
         ):
     if not isinstance(start_pos, Vector2) or not isinstance(end_pos, Vector2):
         raise TypeError("start_pos and end_pos must be Vector2")
-    return Floor(start_pos, end_pos)
+    return Floor(Vector2(start_pos.x, start_pos.y), Vector2(end_pos.x, end_pos.y))
