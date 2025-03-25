@@ -25,6 +25,9 @@ NEXT_FLOOR_MIN_DISTANCE = 20
 # 定数(全オブジェクト移動用)
 ALL_OBJECTS_MOVE_SPEED = 2
 
+# 定数(ゲームURL)
+GAME_URL = None
+
 
 # シーン
 TITLE_SCENE = "title"
