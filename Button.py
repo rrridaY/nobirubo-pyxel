@@ -31,9 +31,9 @@ class Button(Texture):
     def is_clicked(self,click_pos:Vector2):
         return self.pos.x <= click_pos.x <= self.pos.x + self.texture.size.x and self.pos.y <= click_pos.y <= self.pos.y + self.texture.size.y
     
-    def click_event(self,*args, **kwargs):
+    def click_event(self, **kwargs):
         if self.click_event_func:
-            self.click_event_func(*args, **kwargs)
+            self.click_event_func(self, **kwargs)
         else:
             print("click event is None")
 
@@ -60,7 +60,8 @@ class TwitterShareButton(Button):
         super().__init__(pos, texture)
 
     @staticmethod
-    def open_shareURL_with_score(self,*score): # リンク付きボタンのクリック時の処理
-        print("open_shareURL_with_score")
-        share_url = f"https://twitter.com/intent/tweet?text=pyxel-nobirubo-%E3%81%A7%E3%82%B9%E3%82%B3%E3%82%A2{score}%E7%82%B9%E3%82%92%E7%8D%B2%E5%BE%97%E3%81%97%E3%81%BE%E3%81%97%E3%81%9F%EF%BC%81%0A{GAME_URL}"          
+    def open_shareURL_with_score(self,score): # リンク付きボタンのクリック時の処理
+        print(f"open_shareURL_with_score: {score}") 
+        payload = "https://twitter.com/intent/tweet?text=pyxel-nobirubo-%E3%81%A7%E3%82%B9%E3%82%B3%E3%82%A2%20{}%20%E7%82%B9%E3%82%92%E7%8D%B2%E5%BE%97%E3%81%97%E3%81%BE%E3%81%97%E3%81%9F%EF%BC%81%0A&url={}"          
+        share_url = payload.format(score, GAME_URL)
         webbrowser.open(share_url)

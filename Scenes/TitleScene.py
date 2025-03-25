@@ -48,7 +48,7 @@ class TitleScene(BaseScene):
             # シェア用ボタンがクリックされた場合
             if self.sharebutton.is_clicked(clicked_pos):
                 print("Share button is clicked")
-                self.sharebutton.click_event(self.max_score)
+                self.sharebutton.click_event(score=self.max_score)
         
 
     def draw(self):
