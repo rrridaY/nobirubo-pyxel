@@ -14,7 +14,7 @@ next_floor = start_floor.create_next_floor()
 
 class SceneManager:
     # 最初に実行するシーン
-    current_scene = GameScene(start_floor, next_floor)
+    current_scene = TitleScene()
 
     @staticmethod
     def change_scene(scene):
