@@ -23,6 +23,7 @@ from Stick import Stick
 # クラスのインポート(シーン)
 from Scenes.BaseScene import BaseScene
 
+
 # 定数
 from constants import *
 
@@ -82,8 +83,12 @@ class GameScene(BaseScene):
             next_floor : Floor,
             prev_stick : Stick = Stick(Vector2(0, 90), 0),
             game_status : GameStatus = GameStatus.INPUT_STICK_LENGTH,
-            score: int = 0
+            score: int = 0,
+            max_score: int = 0
             ):
+        # baseSceneのinitを呼び出す
+        super().__init__()
+
         # プレイヤーの初期位置
         self.player = Player(Vector2(START_PLAYER_POSX, current_floor.start_pos.y))
         
@@ -102,6 +107,9 @@ class GameScene(BaseScene):
         # スコア
         self.score = score
 
+        # 最大スコア
+        self.max_score = max_score
+
         # GAME OVER描画用
         self.game_over_flame = 0
 
@@ -112,6 +120,7 @@ class GameScene(BaseScene):
 
 
     def update(self):
+        super().update()
         # デバッグ用 シーンリセット #############
         if pyxel.btnp(pyxel.KEY_R):
             start_floor = self.current_floor
@@ -184,26 +193,33 @@ class GameScene(BaseScene):
             if self.player.pos.y > SCREEN_HEIGHT:
                 self.game_over_flame += 1
                 if self.game_over_flame > 30 * 2:
-                    # ゲーム終了
-                    pyxel.quit()
+                    # ゲーム終了　タイトルシーンに戻る
+                    # pyxel.quit()
+                    if self.score > self.max_score:
+                        self.max_score = self.score
+                    from SceneManager import SceneManager
+                    from Scenes.TitleScene import TitleScene
+                    SceneManager.change_scene(TitleScene(self.max_score))
+
+
 
         # プレイヤーがスタート地点に戻った後の処理
         elif GameStatusManager.is_status(GameStatus.PLAYER_RETURNED_TO_START_POS):
             start_floor = self.next_floor
             next_floor = start_floor.create_next_floor()
             from SceneManager import SceneManager
-            SceneManager.change_scene(GameScene(start_floor, next_floor, prev_stick=self.stick, score=self.score+1))
+            SceneManager.change_scene(GameScene(start_floor, next_floor, prev_stick=self.stick, score=self.score+1, max_score=self.max_score))
 
         # デバッグ　左に動かす #################
-        if pyxel.btn(pyxel.KEY_LEFT):
+        # if pyxel.btn(pyxel.KEY_LEFT):
         #     self.stick.move_left(1)
         #     self.current_floor.move_left(1)
         #     self.next_floor.move_left(1)
         #     self.prev_stick.move_left(1)
-            self.player.move_left(1)
-        # デバッグ　右に動かす
-        if pyxel.btn(pyxel.KEY_RIGHT):
-            self.player.move_right(1)
+        #     self.player.move_left(1)
+        # 右に動かす
+        # if pyxel.btn(pyxel.KEY_RIGHT):
+        #     self.player.move_right(1)
 
 
         #######################################
